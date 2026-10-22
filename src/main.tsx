@@ -1,0 +1,11 @@
+import { createRoot } from 'react-dom/client';
+import '@fontsource-variable/manrope';
+import '@fontsource/barlow-condensed/700.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import App from './App';
+import { studioStore } from './state/store';
+import './styles.css';
+import './ui/responsive.css';
+createRoot(document.getElementById('root')!).render(<App />);
+void studioStore.initialize();
