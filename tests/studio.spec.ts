@@ -157,7 +157,9 @@ test('creates a new art direction, searches and removes a project', async ({ pag
   await ready(page);
   await page.getByRole('link', { name: 'Projects', exact: true }).click();
   await page.getByRole('button', { name: /02.*CLEAN.*Press/ }).click();
-  await expect(page.getByRole('button', { name: /Press edition.*new match/ })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Press edition / new match', exact: true }),
+  ).toBeVisible();
   await saved(page);
   await page.getByRole('link', { name: 'Projects', exact: true }).click();
   await expect(page.locator('.project-card')).toHaveCount(2);
@@ -220,7 +222,8 @@ test('falls back to editable vector scenes when WebGL is unavailable', async ({ 
     } as typeof original;
   });
   await ready(page);
-  await expect(page.getByText('VECTOR', { exact: true })).toBeVisible();
+  await expect(page.locator('.stage-renderer')).toHaveText('VECTOR');
+  await expect(page.locator('.stage-vector')).toBeVisible();
   await page.getByLabel('Select scene 4: Goal moment', { exact: true }).click();
   await expect(page.locator('.stage-vector')).toContainText('GOOOAL!');
   await commitField(page, 'Horizontal · px', '20');

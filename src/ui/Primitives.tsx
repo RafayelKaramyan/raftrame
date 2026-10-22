@@ -27,6 +27,7 @@ export function Dialog({
     const dialog = ref.current!;
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     dialog.showModal();
+    dialog.querySelector<HTMLElement>('button, input, select, textarea')?.focus();
     return () => {
       dialog.close();
       opener?.focus();
@@ -37,6 +38,34 @@ export function Dialog({
       ref={ref}
       className="dialog"
       aria-labelledby={titleId}
+      onKeyDown={(event) => {
+        if (event.key !== 'Tab') return;
+        const items = Array.from(
+          event.currentTarget.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), a[href], input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          ),
+        ).filter((el) => el.getClientRects().length > 0);
+        const first = items[0],
+          last = items.at(-1);
+        if (!first || !last) {
+          event.preventDefault();
+          return;
+        }
+        if (
+          event.shiftKey &&
+          (document.activeElement === first ||
+            !event.currentTarget.contains(document.activeElement))
+        ) {
+          event.preventDefault();
+          last.focus();
+        } else if (
+          !event.shiftKey &&
+          (document.activeElement === last || !event.currentTarget.contains(document.activeElement))
+        ) {
+          event.preventDefault();
+          first.focus();
+        }
+      }}
       onCancel={(event) => {
         event.preventDefault();
         onClose();
@@ -82,7 +111,7 @@ export function Field({
   const id = useId();
   return (
     <label className="field">
-      <span>{label}</span>
+      <span id={`${id}-label`}>{label}</span>
       <input
         key={String(value)}
         defaultValue={value}
@@ -93,6 +122,7 @@ export function Field({
         step={step}
         maxLength={maxLength}
         minLength={minLength}
+        aria-labelledby={`${id}-label`}
         aria-describedby={error ? id : undefined}
         aria-invalid={error ? true : undefined}
         onInput={() => setError('')}

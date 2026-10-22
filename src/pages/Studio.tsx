@@ -84,15 +84,10 @@ export default function Studio() {
     };
     window.addEventListener('keydown', keyboard);
     document.addEventListener('visibilitychange', visibility);
-    const leave = (event: BeforeUnloadEvent) => {
-      if (studioStore.snapshot().status !== 'saved') event.preventDefault();
-    };
-    window.addEventListener('beforeunload', leave);
     return () => {
       transport.destroy();
       window.removeEventListener('keydown', keyboard);
       document.removeEventListener('visibilitychange', visibility);
-      window.removeEventListener('beforeunload', leave);
       void studioStore.flush();
     };
   }, [transport]);

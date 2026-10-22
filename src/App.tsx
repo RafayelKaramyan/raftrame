@@ -44,6 +44,21 @@ function RouteFocus() {
 function WorkspaceApp() {
   const state = useStudio();
   const [confirmReset, setConfirmReset] = useState(false);
+  useEffect(() => {
+    const leave = (event: BeforeUnloadEvent) => {
+      const current = studioStore.snapshot();
+      if (current.workspace && current.status !== 'saved') event.preventDefault();
+    };
+    const hidden = () => {
+      if (document.hidden) void studioStore.flush();
+    };
+    window.addEventListener('beforeunload', leave);
+    document.addEventListener('visibilitychange', hidden);
+    return () => {
+      window.removeEventListener('beforeunload', leave);
+      document.removeEventListener('visibilitychange', hidden);
+    };
+  }, []);
   if (!state.workspace) {
     return (
       <div className="startup">

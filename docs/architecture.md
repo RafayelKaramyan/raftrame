@@ -30,6 +30,8 @@ Composition offsets affect the scene's content, while the competition and framin
 
 Unreadable data is preserved. The recovery screen can export the original record and requires a separate explicit replacement action. There is no claim that browser storage is permanent or shared with another device.
 
+A refresh captures the local editing generation before reading. If a new edit arrives before that read finishes, the store retains the edit and reports a conflict. The unsaved-work navigation guard is mounted above all routes, so gallery changes receive the same protection as studio edits.
+
 ## UI and deployment
 
 React pages provide the studio, project gallery and field notes. Native dialogs supply background inertness and focus containment. The router retains the trailing deployment-base slash, and the Pages workflow copies the entry document to `404.html` for static client routing.

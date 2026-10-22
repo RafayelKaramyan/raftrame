@@ -11,7 +11,7 @@ export async function createRenderer(host: HTMLElement, width: number, height: n
     autoStart: false,
     antialias: true,
     resolution: 1,
-    preference: 'webgl',
+    preference: ['webgl'],
     preserveDrawingBuffer: true,
   });
   const canvas = app.canvas;

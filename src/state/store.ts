@@ -26,6 +26,11 @@ export class StudioStore {
   private saving = false;
   private timer: ReturnType<typeof setTimeout> | undefined;
   private channel: BroadcastChannel | null = null;
+  constructor(
+    private readonly openRepository: () => Promise<Repository> = () => openWorkspace(),
+    private readonly makeChannel: () => BroadcastChannel | null = () =>
+      'BroadcastChannel' in globalThis ? new BroadcastChannel('raftrame-revisions') : null,
+  ) {}
   snapshot = (): StudioState => this.state;
   subscribe = (fn: () => void): (() => void) => {
     this.listeners.add(fn);
@@ -37,11 +42,13 @@ export class StudioStore {
   }
   async initialize(): Promise<void> {
     try {
-      this.repository = await openWorkspace();
+      this.repository?.close();
+      this.channel?.close();
+      this.repository = await this.openRepository();
       const workspace = await this.repository.load();
       this.adopt(workspace);
-      if ('BroadcastChannel' in globalThis) {
-        this.channel = new BroadcastChannel('raftrame-revisions');
+      this.channel = this.makeChannel();
+      if (this.channel) {
         this.channel.onmessage = (event: MessageEvent<unknown>) => {
           if (
             typeof event.data !== 'number' ||
@@ -122,6 +129,7 @@ export class StudioStore {
     this.timer = setTimeout(() => void this.flush(), 250);
   }
   flush = async (): Promise<void> => {
+    clearTimeout(this.timer);
     if (
       this.saving ||
       !this.repository ||
@@ -144,6 +152,7 @@ export class StudioStore {
     } catch (error) {
       this.report(error);
     } finally {
+      clearTimeout(this.timer);
       this.saving = false;
     }
   };
@@ -189,8 +198,22 @@ export class StudioStore {
   };
   loadLatest = async (): Promise<void> => {
     clearTimeout(this.timer);
+    const generation = this.pending;
     try {
-      if (this.repository) this.adopt(await this.repository.load());
+      if (this.repository) {
+        const workspace = await this.repository.load();
+        if (this.pending !== generation || this.saving) {
+          clearTimeout(this.timer);
+          this.emit({
+            ...this.state,
+            status: 'conflict',
+            error:
+              'A local edit arrived during refresh. Your edit is preserved; export it before loading the saved workspace.',
+          });
+          return;
+        }
+        this.adopt(workspace);
+      }
     } catch (error) {
       this.report(error);
     }
