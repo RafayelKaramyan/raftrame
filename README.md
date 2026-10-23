@@ -4,7 +4,17 @@
 
 Built by **Rafayel Karamyan** as an independent portfolio product. Teams, matches and graphics are fictional and authored for this project.
 
-Publication is being prepared. The verified demo and release evidence will be added here after deployment.
+[Open the live studio](https://rafayelkaramyan.github.io/raftrame/) · [Verified build and browser checks](https://github.com/RafayelKaramyan/raftrame/actions/runs/39773826788)
+
+![Raftrame studio with the match opener, scene sequence, timeline and inspector](docs/images/studio.jpg)
+
+The published build passed 42 unit/integration tests and all 54 browser cases across Chromium, Firefox and Pixel 7 emulation. Editing, reload persistence, JSON export/import and 1920 × 1080 PNG export were also verified on the live demo. See the [validation record](docs/validation.md) for the release evidence and testing limits.
+
+## Quick tour
+
+1. Choose a scene in **Your sequence**, then open **Match** to edit the teams, score or starting eleven.
+2. Scrub the timeline or press **Space** to preview the sequence. Use **Scene** to adjust timing and position, or **Style** to change the art direction.
+3. Open **Export project** to download an editable JSON project or a PNG of the current frame. Import the JSON to continue as a separate editable copy.
 
 ## The studio
 
